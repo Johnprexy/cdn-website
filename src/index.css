@@ -1,32 +1,49 @@
-@import "tailwindcss";
-
-@theme {
-  --font-display: "Cormorant Garamond", Georgia, serif;
-  --font-body: "DM Sans", system-ui, sans-serif;
-  --color-ink: #0d1225;
-  --color-ink-mid: #1a2355;
-  --color-navy: #1e2d6b;
-  --color-royal: #2a52be;
-  --color-royal-lt: #4070e0;
-  --color-purple: #5c2fa0;
-  --color-purple-lt: #7b4ec8;
-  --color-gold: #c9a020;
-  --color-gold-lt: #e8c040;
-  --color-cream: #faf8f3;
-  --color-offwhite: #f2f0f8;
-  --color-border: #e0ddf0;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @layer base {
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
-  body { font-family: "DM Sans", system-ui, sans-serif; background: #fff; color: #1a1f3a; overflow-x: hidden; }
-  h1,h2,h3,h4,h5 { font-family: "Cormorant Garamond", Georgia, serif; line-height: 1.15; }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  body {
+    font-family: "DM Sans", system-ui, -apple-system, sans-serif;
+    background: #ffffff;
+    color: #1a1f3a;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+  }
+  h1, h2, h3, h4, h5 {
+    font-family: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+    line-height: 1.15;
+  }
+  img { max-width: 100%; height: auto; }
+  a, button { -webkit-tap-highlight-color: transparent; }
 }
 
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: #0d1225; }
-::-webkit-scrollbar-thumb { background: #2a52be; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #e8c040; }
+@layer utilities {
+  .text-gradient-gold {
+    background: linear-gradient(135deg, #e8c040, #c9a020);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .text-gradient-royal {
+    background: linear-gradient(135deg, #4070e0, #2a52be);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
 
-@media (hover: hover) { body { cursor: none; } }
+/* Scrollbar - desktop only */
+@media (hover: hover) {
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: #0d1225; }
+  ::-webkit-scrollbar-thumb { background: #2a52be; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #e8c040; }
+  body { cursor: none; }
+}
+
+@supports (-webkit-touch-callout: none) {
+  body { cursor: auto !important; }
+}

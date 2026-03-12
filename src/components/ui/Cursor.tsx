@@ -4,36 +4,48 @@ import { motion, useMotionValue, useSpring } from 'framer-motion';
 export default function Cursor() {
   const dotX = useMotionValue(-100);
   const dotY = useMotionValue(-100);
-  const ringX = useSpring(useMotionValue(-100), { stiffness: 150, damping: 20 });
-  const ringY = useSpring(useMotionValue(-100), { stiffness: 150, damping: 20 });
+  const rawRingX = useMotionValue(-100);
+  const rawRingY = useMotionValue(-100);
+  const ringX = useSpring(rawRingX, { stiffness: 150, damping: 20 });
+  const ringY = useSpring(rawRingY, { stiffness: 150, damping: 20 });
   const ringScale = useSpring(1, { stiffness: 300, damping: 25 });
-  const isVisible = useRef(false);
+  const isTouch = useRef(false);
 
   useEffect(() => {
-    const isTouch = window.matchMedia('(hover: none)').matches;
-    if (isTouch) return;
+    isTouch.current = window.matchMedia('(hover: none)').matches;
+    if (isTouch.current) return;
 
     const move = (e: MouseEvent) => {
       dotX.set(e.clientX);
       dotY.set(e.clientY);
-      (ringX as ReturnType<typeof useSpring>).set(e.clientX);
-      (ringY as ReturnType<typeof useSpring>).set(e.clientY);
-      if (!isVisible.current) isVisible.current = true;
+      rawRingX.set(e.clientX);
+      rawRingY.set(e.clientY);
     };
 
     const onEnter = () => ringScale.set(1.6);
     const onLeave = () => ringScale.set(1);
 
     document.addEventListener('mousemove', move);
-    document.querySelectorAll('a, button, [role="button"]').forEach(el => {
+
+    const interactables = document.querySelectorAll('a, button, [role="button"]');
+    interactables.forEach(el => {
       el.addEventListener('mouseenter', onEnter);
       el.addEventListener('mouseleave', onLeave);
     });
 
     return () => {
       document.removeEventListener('mousemove', move);
+      interactables.forEach(el => {
+        el.removeEventListener('mouseenter', onEnter);
+        el.removeEventListener('mouseleave', onLeave);
+      });
     };
-  }, []);
+  }, [dotX, dotY, rawRingX, rawRingY, ringScale]);
+
+  // Don't render on touch devices at all
+  if (typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches) {
+    return null;
+  }
 
   return (
     <>
