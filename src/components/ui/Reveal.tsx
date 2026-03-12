@@ -1,4 +1,5 @@
-import { useEffect, useRef, ReactNode, CSSProperties } from 'react';
+import { motion, useInView } from 'framer-motion';
+import { useRef, ReactNode, CSSProperties } from 'react';
 
 interface RevealProps {
   children: ReactNode;
@@ -8,36 +9,28 @@ interface RevealProps {
   direction?: 'up' | 'left' | 'right' | 'scale';
 }
 
+const variants = {
+  up:    { hidden: { opacity: 0, y: 32 },        visible: { opacity: 1, y: 0 } },
+  left:  { hidden: { opacity: 0, x: -32 },       visible: { opacity: 1, x: 0 } },
+  right: { hidden: { opacity: 0, x: 32 },        visible: { opacity: 1, x: 0 } },
+  scale: { hidden: { opacity: 0, scale: 0.92 },  visible: { opacity: 1, scale: 1 } },
+};
+
 export default function Reveal({ children, className, style, delay = 0, direction = 'up' }: RevealProps) {
   const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    el.style.opacity = '0';
-    el.style.transform = direction === 'up' ? 'translateY(30px)'
-      : direction === 'left' ? 'translateX(-30px)'
-      : direction === 'right' ? 'translateX(30px)'
-      : 'scale(0.94)';
-    el.style.transition = `opacity 0.7s ease ${delay}s, transform 0.7s ease ${delay}s`;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          el.style.opacity = '1';
-          el.style.transform = 'none';
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [delay, direction]);
+  const inView = useInView(ref, { once: true, margin: '0px 0px -60px 0px' });
 
   return (
-    <div ref={ref} className={className} style={style}>
+    <motion.div
+      ref={ref}
+      className={className}
+      style={style}
+      variants={variants[direction]}
+      initial="hidden"
+      animate={inView ? 'visible' : 'hidden'}
+      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay }}
+    >
       {children}
-    </div>
+    </motion.div>
   );
 }
